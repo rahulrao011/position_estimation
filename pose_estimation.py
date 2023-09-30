@@ -64,7 +64,7 @@ print(f'Height: {height}')
 
 # initiating holistic model
 # context manager: it's configuring the Holistic object with certain minimum detection and tracking confidence levels.
-with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+with mp_holistic.Holistic(min_detection_confidence=0.3, min_tracking_confidence=0.3) as holistic:
     while cap.isOpened():
         ret, frame = cap.read()
         
