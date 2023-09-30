@@ -92,7 +92,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
             # calculate angle between relevant points
             angle = calculate_angle(a, b, c)
-            print(angle)
+            #print(angle)
             time.sleep(0.5)
             # visualize angle
 
