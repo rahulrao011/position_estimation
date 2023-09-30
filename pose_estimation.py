@@ -1,7 +1,7 @@
 import mediapipe as mp
 import cv2
 import numpy as np
-
+import time 
 
 
 '''
@@ -92,7 +92,8 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
             # calculate angle between relevant points
             angle = calculate_angle(a, b, c)
-
+            print(angle)
+            time.sleep(0.5)
             # visualize angle
 
             # not working
@@ -100,19 +101,27 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
 
             # tracks if a bicep curl has been completed and how many bicep curls have been completed
-            if angle > 160:
+
+            if angle < 25:
                 stage = 'down'
-            if angle < 30 and stage == 'down':
+                #in this context, down means retracted 
+            if angle > 150 and stage == 'down':
                 stage = 'up'
-                counter += 1
-                print(counter)
+                counter+=1
+                print('i just punched a ho ',counter)
+            # if angle > 130:
+            #     stage = 'down'
+            # if angle < 30 and stage == 'down':
+            #     stage = 'up'
+            #     counter += 1
+            #     print(counter)
 
         except:
             pass
 
 
         # draws a blue rectangle in the top left of the screen
-        cv2.rectangle(image, (0, 0), (225, 73), (245, 117, 16), -1)
+        #cv2.rectangle(image, (0, 0), (225, 73), (245, 117, 16), -1)
 
 
         # render / draw landmarks
