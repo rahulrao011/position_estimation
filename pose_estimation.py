@@ -12,7 +12,7 @@ import numpy as np
 '''
 
 
-
+#this takes three points on the pose net, like elbow, shoulder, and wrist, and calculates the angle that there is there
 def calculate_angle(a, b, c):
     a = np.array(a)
     b = np.array(b)
@@ -59,6 +59,7 @@ print(f'Height: {height}')
 
 
 # initiating holistic model
+# context manager: it's configuring the Holistic object with certain minimum detection and tracking confidence levels.
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
     while cap.isOpened():
         ret, frame = cap.read()
@@ -66,6 +67,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         
         # recolor feed to RGB
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        #writeable stuff improves memory
         image.flags.writeable = False
 
         # make detections
@@ -79,8 +81,11 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
         try:
             landmarks = results.pose_landmarks.landmark
+            #.landmark gives you hashmap stuff that has references to all of your xyz tuples 
 
             # get coords for relevant points
+
+            #get the x and y of the given body point on the 2d camera plane
             a = [landmarks[relevant_landmarks_numerical[0]].x, landmarks[relevant_landmarks_numerical[0]].y]
             b = [landmarks[relevant_landmarks_numerical[1]].x, landmarks[relevant_landmarks_numerical[1]].y]
             c = [landmarks[relevant_landmarks_numerical[2]].x, landmarks[relevant_landmarks_numerical[2]].y]
