@@ -33,7 +33,11 @@ mp_holistic = mp.solutions.holistic
 relevant_landmarks_numerical = [
     mp_holistic.PoseLandmark.LEFT_SHOULDER.value,
     mp_holistic.PoseLandmark.LEFT_ELBOW.value,
-    mp_holistic.PoseLandmark.LEFT_WRIST.value
+    mp_holistic.PoseLandmark.LEFT_WRIST.value,
+
+    mp_holistic.PoseLandmark.RIGHT_SHOULDER.value,
+    mp_holistic.PoseLandmark.RIGHT_ELBOW.value,
+    mp_holistic.PoseLandmark.RIGHT_WRIST.value
 ]
 print(relevant_landmarks_numerical)
 
@@ -42,8 +46,8 @@ print(relevant_landmarks_numerical)
 counter = 0
 
 # either 'up' or 'down'
-stage = None
-
+leftStage = None
+rightStage = None
 
 
 # get opencv camera
@@ -90,8 +94,13 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
             b = [landmarks[relevant_landmarks_numerical[1]].x, landmarks[relevant_landmarks_numerical[1]].y]
             c = [landmarks[relevant_landmarks_numerical[2]].x, landmarks[relevant_landmarks_numerical[2]].y]
 
+            d = [landmarks[relevant_landmarks_numerical[3]].x, landmarks[relevant_landmarks_numerical[3]].y]
+            e = [landmarks[relevant_landmarks_numerical[4]].x, landmarks[relevant_landmarks_numerical[4]].y]
+            f = [landmarks[relevant_landmarks_numerical[5]].x, landmarks[relevant_landmarks_numerical[5]].y]
+
             # calculate angle between relevant points
-            angle = calculate_angle(a, b, c)
+            leftAngle = calculate_angle(a, b, c)
+            rightAngle = calculate_angle(d,e,f)
             #print(angle)
             #time.sleep(0.5)
             # visualize angle
@@ -102,13 +111,21 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
             # tracks if a bicep curl has been completed and how many bicep curls have been completed
 
-            if angle < 25:
-                stage = 'down'
+            if leftAngle < 25:
+                leftStage = 'down'
                 #in this context, down means retracted 
-            if angle > 150 and stage == 'down':
-                stage = 'up'
+            if leftAngle > 150 and leftStage == 'down':
+                leftStage = 'up'
                 counter+=1
-                print('i just punched a ho ',counter)
+                print('left punch',counter)
+
+            if rightAngle < 25:
+                rightStage = 'down'
+                #in this context, down means retracted 
+            if rightAngle > 150 and rightStage == 'down':
+                rightStage = 'up'
+                counter+=1
+                print('right punch',counter)
             # if angle > 130:
             #     stage = 'down'
             # if angle < 30 and stage == 'down':
