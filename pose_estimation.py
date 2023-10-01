@@ -11,6 +11,18 @@ import time
 ### Youtube project tutorial: https://www.youtube.com/watch?v=06TE_U21FK4
 '''
 
+### CONSTANTS + VARIABLES:
+
+# bicep curl counter
+counter = 0
+
+# either True or False
+leftBicepStage = None
+leftShoulderStage = None
+
+rightBicepStage = None
+rightShoulderStage = None
+
 
 #this takes three points on the pose net, like elbow, shoulder, and wrist, and calculates the angle that there is there
 def calculate_angle(a, b, c):
@@ -31,23 +43,19 @@ mp_drawing = mp.solutions.drawing_utils
 mp_holistic = mp.solutions.holistic
 
 relevant_landmarks_numerical = [
+    # left side
     mp_holistic.PoseLandmark.LEFT_SHOULDER.value,
     mp_holistic.PoseLandmark.LEFT_ELBOW.value,
     mp_holistic.PoseLandmark.LEFT_WRIST.value,
+    mp_holistic.PoseLandmark.LEFT_HIP.value,
 
+    # right side
     mp_holistic.PoseLandmark.RIGHT_SHOULDER.value,
     mp_holistic.PoseLandmark.RIGHT_ELBOW.value,
-    mp_holistic.PoseLandmark.RIGHT_WRIST.value
+    mp_holistic.PoseLandmark.RIGHT_WRIST.value,
+    mp_holistic.PoseLandmark.RIGHT_HIP.value,
 ]
 print(relevant_landmarks_numerical)
-
-
-# bicep curl counter
-counter = 0
-
-# either 'up' or 'down'
-leftStage = None
-rightStage = None
 
 
 # get opencv camera
@@ -90,17 +98,40 @@ with mp_holistic.Holistic(min_detection_confidence=0.3, min_tracking_confidence=
             # get coords for relevant points
 
             #get the x and y of the given body point on the 2d camera plane
-            a = [landmarks[relevant_landmarks_numerical[0]].x, landmarks[relevant_landmarks_numerical[0]].y]
-            b = [landmarks[relevant_landmarks_numerical[1]].x, landmarks[relevant_landmarks_numerical[1]].y]
-            c = [landmarks[relevant_landmarks_numerical[2]].x, landmarks[relevant_landmarks_numerical[2]].y]
 
-            d = [landmarks[relevant_landmarks_numerical[3]].x, landmarks[relevant_landmarks_numerical[3]].y]
-            e = [landmarks[relevant_landmarks_numerical[4]].x, landmarks[relevant_landmarks_numerical[4]].y]
-            f = [landmarks[relevant_landmarks_numerical[5]].x, landmarks[relevant_landmarks_numerical[5]].y]
+            '''
+             mp_holistic.PoseLandmark.LEFT_SHOULDER.value,
+    mp_holistic.PoseLandmark.LEFT_ELBOW.value,
+    mp_holistic.PoseLandmark.LEFT_WRIST.value,
+    mp_holistic.PoseLandmark.LEFT_HIP.value,
+
+    # right side
+    mp_holistic.PoseLandmark.RIGHT_SHOULDER.value,
+    mp_holistic.PoseLandmark.RIGHT_ELBOW.value,
+    mp_holistic.PoseLandmark.RIGHT_WRIST.value,
+    mp_holistic.PoseLandmark.RIGHT_HIP.value,
+            '''
+
+            # landmarks is similar to a list of hash-maps: with each coordinate in the list: {12:{'x': 3.141, 'y': 2.712, 'z': 12.31},... }
+
+            # these are all coordinates (x, y)
+
+            left_shoulder = [landmarks[relevant_landmarks_numerical[0]].x, landmarks[relevant_landmarks_numerical[0]].y]
+            left_elbow = [landmarks[relevant_landmarks_numerical[1]].x, landmarks[relevant_landmarks_numerical[1]].y]
+            left_wrist = [landmarks[relevant_landmarks_numerical[2]].x, landmarks[relevant_landmarks_numerical[2]].y]
+            left_hip = [landmarks[relevant_landmarks_numerical[3]].x, landmarks[relevant_landmarks_numerical[3]].y]
+
+            right_shoulder = [landmarks[relevant_landmarks_numerical[4]].x, landmarks[relevant_landmarks_numerical[4]].y]
+            right_elbow = [landmarks[relevant_landmarks_numerical[5]].x, landmarks[relevant_landmarks_numerical[5]].y]
+            right_wrist = [landmarks[relevant_landmarks_numerical[6]].x, landmarks[relevant_landmarks_numerical[6]].y]
+            right_hip = [landmarks[relevant_landmarks_numerical[7]].x, landmarks[relevant_landmarks_numerical[7]].y]
 
             # calculate angle between relevant points
-            leftAngle = calculate_angle(a, b, c)
-            rightAngle = calculate_angle(d,e,f)
+            leftBicepAngle = calculate_angle(left_shoulder, left_elbow, left_wrist)
+            rightBicepAngle = calculate_angle(right_shoulder, right_elbow, right_wrist)
+
+            leftShoulderAngle = calculate_angle(left_hip, left_shoulder, left_elbow)
+            rightShoulderAngle = calculate_angle(right_hip, right_shoulder, right_elbow)
             #print(angle)
             #time.sleep(0.5)
             # visualize angle
@@ -111,27 +142,36 @@ with mp_holistic.Holistic(min_detection_confidence=0.3, min_tracking_confidence=
 
             # tracks if a bicep curl has been completed and how many bicep curls have been completed
 
-            if leftAngle < 25:
-                leftStage = 'down'
-                #in this context, down means retracted 
-            if leftAngle > 150 and leftStage == 'down':
-                leftStage = 'up'
-                counter+=1
-                print('left punch',counter)
 
-            if rightAngle < 25:
-                rightStage = 'down'
-                #in this context, down means retracted 
-            if rightAngle > 150 and rightStage == 'down':
-                rightStage = 'up'
+            # Biceps
+            if leftBicepAngle < 25:
+                leftBicepStage = False
+            elif leftBicepAngle > 150 and not leftBicepStage:
+                leftBicepStage = True
+
+            if rightBicepAngle < 25:
+                rightBicepStage = False
+            elif rightBicepAngle > 150 and not rightBicepStage:
+                rightBicepStage = True
+
+            # Shoulders
+            if leftShoulderAngle < 10:
+                leftShoulderStage = False
+            elif leftShoulderAngle > 50 and not leftShoulderStage:
+                leftShoulderStage = True
+
+            if rightShoulderAngle < 10:
+                rightShoulderStage = False
+            elif rightShoulderAngle > 50 and not rightShoulderStage:
+                rightShoulderStage = True
+
+            if leftBicepStage and leftShoulderStage:
                 counter+=1
-                print('right punch',counter)
-            # if angle > 130:
-            #     stage = 'down'
-            # if angle < 30 and stage == 'down':
-            #     stage = 'up'
-            #     counter += 1
-            #     print(counter)
+                print('left punch: ', counter)
+
+            if rightBicepStage and rightShoulderStage:
+                counter+=1
+                print('right punch: ', counter)
 
         except:
             pass
