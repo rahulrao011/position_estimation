@@ -62,12 +62,67 @@ print(f'Height: {height}')
 
 
 
+
+
+
+
+# Define states
+WAITING_FOR_PUNCH = 0
+PUNCH_DETECTED = 1
+
+# Initialize state
+state = WAITING_FOR_PUNCH
+
+# ... (rest of your code)
+
+
+    # ... (rest of your code)
+
+
+
+
 # initiating holistic model
 # context manager: it's configuring the Holistic object with certain minimum detection and tracking confidence levels.
 with mp_holistic.Holistic(min_detection_confidence=0.3, min_tracking_confidence=0.3) as holistic:
     while cap.isOpened():
         ret, frame = cap.read()
-        
+
+
+        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        #writeable stuff improves memory
+        image.flags.writeable = False
+
+        # make detections
+        results = holistic.process(image)
+
+        # recolor image back to BGR for rendering
+        image.flags.writeable = True
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+
+
+        # ... (rest of your code)
+
+        try:
+            leftBicepAngle, leftShoulderAngle, rightBicepAngle, rightShoulderAngle = get_angles(image, holistic, relevant_landmarks_numerical)
+
+            if state == WAITING_FOR_PUNCH:
+                # Detect punch initiation
+                if leftShoulderAngle > 30 and leftBicepAngle > 150:
+                    state = PUNCH_DETECTED
+            elif state == PUNCH_DETECTED:
+                # Check for punch completion
+                if leftShoulderAngle < 15 and leftBicepAngle < 25:
+                    counter += 1
+                    print('Punch detected - counter:', counter)
+                    state = WAITING_FOR_PUNCH
+
+        except:
+            pass
+
+
+
+        '''
         
         # recolor feed to RGB
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -130,6 +185,9 @@ with mp_holistic.Holistic(min_detection_confidence=0.3, min_tracking_confidence=
         except:
             pass
 
+            
+
+        '''
         # hand stuff
         
         # right hand
