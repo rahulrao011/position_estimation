@@ -105,14 +105,15 @@ with mp_holistic.Holistic(min_detection_confidence=0.3, min_tracking_confidence=
 
         try:
             leftBicepAngle, leftShoulderAngle, rightBicepAngle, rightShoulderAngle = get_angles(image, holistic, relevant_landmarks_numerical)
-
+            #print(leftBicepAngle, leftShoulderAngle)
+            #print(leftShoulderAngle > 30 and leftBicepAngle > 150)
             if state == WAITING_FOR_PUNCH:
                 # Detect punch initiation
-                if leftShoulderAngle > 30 and leftBicepAngle > 150:
+                if leftShoulderAngle > 20 and leftBicepAngle > 90:
                     state = PUNCH_DETECTED
             elif state == PUNCH_DETECTED:
                 # Check for punch completion
-                if leftShoulderAngle < 15 and leftBicepAngle < 25:
+                if leftShoulderAngle < 25 or leftBicepAngle < 25:
                     counter += 1
                     print('Punch detected - counter:', counter)
                     state = WAITING_FOR_PUNCH
