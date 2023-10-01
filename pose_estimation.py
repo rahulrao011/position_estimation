@@ -24,6 +24,9 @@ rightBicepStage = None
 rightShoulderStage = None
 
 
+finishedLeftPunch = False
+finishedRightPunch = False
+
 #this takes three points on the pose net, like elbow, shoulder, and wrist, and calculates the angle that there is there
 def calculate_angle(a, b, c):
     a = np.array(a)
@@ -144,32 +147,42 @@ with mp_holistic.Holistic(min_detection_confidence=0.3, min_tracking_confidence=
 
 
             # Biceps
-            if leftBicepAngle < 25:
+            if leftBicepAngle < 25 or finishedLeftPunch:
                 leftBicepStage = False
-            elif leftBicepAngle > 150 and not leftBicepStage:
+                finishedLeftPunch = False
+            if leftBicepAngle > 150 and not leftBicepStage and not finishedLeftPunch:
                 leftBicepStage = True
 
-            if rightBicepAngle < 25:
+            if rightBicepAngle < 25 or finishedRightPunch:
                 rightBicepStage = False
-            elif rightBicepAngle > 150 and not rightBicepStage:
+                finishedRightPunch = False
+            if rightBicepAngle > 150 and not rightBicepStage and not finishedRightPunch:
                 rightBicepStage = True
 
             # Shoulders
-            if leftShoulderAngle < 10:
+            if leftShoulderAngle < 10 or finishedLeftPunch:
                 leftShoulderStage = False
+                finishedLeftPunch = False
             elif leftShoulderAngle > 50 and not leftShoulderStage:
                 leftShoulderStage = True
 
-            if rightShoulderAngle < 10:
+            if rightShoulderAngle < 10 or finishedRightPunch:
                 rightShoulderStage = False
+                finishedRightPunch = False
             elif rightShoulderAngle > 50 and not rightShoulderStage:
                 rightShoulderStage = True
 
-            if leftBicepStage and leftShoulderStage:
+            if leftBicepStage and leftShoulderStage and not finishedLeftPunch:
+                leftBicepStage = None
+                leftShoulderStage = None
+                finishedLeftPunch = True
                 counter+=1
                 print('left punch: ', counter)
 
-            if rightBicepStage and rightShoulderStage:
+            if rightBicepStage and rightShoulderStage and not finishedRightPunch:
+                rightBicepStage = None
+                rightShoulderStage = None
+                finishedRightPunch = True
                 counter+=1
                 print('right punch: ', counter)
 
