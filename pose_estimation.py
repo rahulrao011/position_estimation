@@ -137,10 +137,6 @@ with mp_holistic.Holistic(min_detection_confidence=0.3, min_tracking_confidence=
             rightShoulderAngle = calculate_angle(right_hip, right_shoulder, right_elbow)
             #print(angle)
             #time.sleep(0.5)
-            # visualize angle
-
-            # not working
-            # cv2.putText(image, str(angle), tuple(np.multiply(elbow, [width, height]).astype(int)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AAA)
 
 
             # tracks if a bicep curl has been completed and how many bicep curls have been completed
@@ -150,48 +146,83 @@ with mp_holistic.Holistic(min_detection_confidence=0.3, min_tracking_confidence=
             if leftBicepAngle < 25 or finishedLeftPunch:
                 leftBicepStage = False
                 finishedLeftPunch = False
-            if leftBicepAngle > 150 and not leftBicepStage and not finishedLeftPunch:
+            elif leftBicepAngle > 150 and not leftBicepStage and not finishedLeftPunch:
                 leftBicepStage = True
 
+            '''
             if rightBicepAngle < 25 or finishedRightPunch:
                 rightBicepStage = False
                 finishedRightPunch = False
-            if rightBicepAngle > 150 and not rightBicepStage and not finishedRightPunch:
+            elif rightBicepAngle > 150 and not rightBicepStage and not finishedRightPunch:
                 rightBicepStage = True
 
+
+
+            list = [
+            left_elbow_angle at time t = 0 is the 0th element,
+            left_elbow_angle at time t = 1 is the 1th element.
+            ]
+
+            math = (list[1] - list[2]) / (time difference between frames) = rate of change of the elbow angle
+
+            if math > some number:
+            
+            if it is + then the elbow angle is increasing
+
+            if it is 0 then the elbow angle is not changing
+
+            if it is - then im retracting my arm
+
+
+
+            '''
+
             # Shoulders
-            if leftShoulderAngle < 10 or finishedLeftPunch:
+            if leftShoulderAngle < 15 or finishedLeftPunch:
                 leftShoulderStage = False
                 finishedLeftPunch = False
-            elif leftShoulderAngle > 50 and not leftShoulderStage:
+            elif leftShoulderAngle > 30 and not leftShoulderStage:
                 leftShoulderStage = True
 
-            if rightShoulderAngle < 10 or finishedRightPunch:
+
+            '''
+            if rightShoulderAngle < 15 or finishedRightPunch:
                 rightShoulderStage = False
                 finishedRightPunch = False
-            elif rightShoulderAngle > 50 and not rightShoulderStage:
+            elif rightShoulderAngle > 30 and not rightShoulderStage:
                 rightShoulderStage = True
+            '''
+
+            # random logs
+            #print(f'Right Shoulder Sage: {rightShoulderAngle}, {rightShoulderStage}')
+            #print(f'Right Bicep Stage: {rightBicepAngle}, {rightBicepStage}')
+            #print(f'Finished Right Punch: {finishedRightPunch}')
+
+            #print('Right Bicep Angle: ', {rightBicepAngle})
+
+            #time.sleep(0.5)
+
 
             if leftBicepStage and leftShoulderStage and not finishedLeftPunch:
                 leftBicepStage = None
                 leftShoulderStage = None
                 finishedLeftPunch = True
-                counter+=1
+                counter += 1
                 print('left punch: ', counter)
 
+
+            '''
             if rightBicepStage and rightShoulderStage and not finishedRightPunch:
                 rightBicepStage = None
                 rightShoulderStage = None
                 finishedRightPunch = True
-                counter+=1
+                counter += 1
                 print('right punch: ', counter)
+            '''
+            
 
         except:
             pass
-
-
-        # draws a blue rectangle in the top left of the screen
-        #cv2.rectangle(image, (0, 0), (225, 73), (245, 117, 16), -1)
 
 
         # render / draw landmarks
