@@ -67,11 +67,11 @@ print(f'Height: {height}')
 
 
 # Define states
-WAITING_FOR_PUNCH = 0
-PUNCH_DETECTED = 1
+WAITING_FOR_LEFT_PUNCH = 0
+LEFT_PUNCH_DETECTED = 1
 
 # Initialize state
-state = WAITING_FOR_PUNCH
+state = WAITING_FOR_LEFT_PUNCH
 
 # ... (rest of your code)
 
@@ -107,16 +107,16 @@ with mp_holistic.Holistic(min_detection_confidence=0.3, min_tracking_confidence=
             leftBicepAngle, leftShoulderAngle, rightBicepAngle, rightShoulderAngle = get_angles(image, holistic, relevant_landmarks_numerical)
             #print(leftBicepAngle, leftShoulderAngle)
             #print(leftShoulderAngle > 30 and leftBicepAngle > 150)
-            if state == WAITING_FOR_PUNCH:
+            if state == WAITING_FOR_LEFT_PUNCH:
                 # Detect punch initiation
                 if leftShoulderAngle > 20 and leftBicepAngle > 90:
-                    state = PUNCH_DETECTED
-            elif state == PUNCH_DETECTED:
+                    state = LEFT_PUNCH_DETECTED
+            elif state == LEFT_PUNCH_DETECTED:
                 # Check for punch completion
                 if leftShoulderAngle < 25 or leftBicepAngle < 25:
                     counter += 1
                     print('Punch detected - counter:', counter)
-                    state = WAITING_FOR_PUNCH
+                    state = WAITING_FOR_LEFT_PUNCH
 
         except:
             pass
