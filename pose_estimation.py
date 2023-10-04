@@ -67,12 +67,18 @@ print(f'Height: {height}')
 
 
 # Define states
+
+#left state
 WAITING_FOR_LEFT_PUNCH = 0
 LEFT_PUNCH_DETECTED = 1
 
-# Initialize state
-state = WAITING_FOR_LEFT_PUNCH
+#right state
+WAITING_FOR_RIGHT_PUNCH = 0
+RIGHT_PUNCH_DETECTED = 1
 
+# Initialize state
+left_state = WAITING_FOR_LEFT_PUNCH
+right_state = WAITING_FOR_RIGHT_PUNCH
 # ... (rest of your code)
 
 
@@ -107,16 +113,29 @@ with mp_holistic.Holistic(min_detection_confidence=0.3, min_tracking_confidence=
             leftBicepAngle, leftShoulderAngle, rightBicepAngle, rightShoulderAngle = get_angles(image, holistic, relevant_landmarks_numerical)
             #print(leftBicepAngle, leftShoulderAngle)
             #print(leftShoulderAngle > 30 and leftBicepAngle > 150)
-            if state == WAITING_FOR_LEFT_PUNCH:
+            
+             if right_state == WAITING_FOR_RIGHT_PUNCH:
+                # Detect punch initiation
+                if rightShoulderAngle > 20 and rightBicepAngle > 90:
+                    right_state = RIGHT_PUNCH_DETECTED
+            elif right_state == RIGHT_PUNCH_DETECTED:
+                # Check for punch completion
+                if rightShoulderAngle < 25 or rightBicepAngle < 25:
+                    counter += 1
+                    print('Right punch detected - counter:', counter)
+                    right_state = WAITING_FOR_RIGHT_PUNCH
+
+
+            if left_state == WAITING_FOR_LEFT_PUNCH:
                 # Detect punch initiation
                 if leftShoulderAngle > 20 and leftBicepAngle > 90:
-                    state = LEFT_PUNCH_DETECTED
-            elif state == LEFT_PUNCH_DETECTED:
+                    left_state = LEFT_PUNCH_DETECTED
+            elif left_state == LEFT_PUNCH_DETECTED:
                 # Check for punch completion
                 if leftShoulderAngle < 25 or leftBicepAngle < 25:
                     counter += 1
-                    print('Punch detected - counter:', counter)
-                    state = WAITING_FOR_LEFT_PUNCH
+                    print('Left punch detected - counter:', counter)
+                    left_state = WAITING_FOR_LEFT_PUNCH
 
         except:
             pass
